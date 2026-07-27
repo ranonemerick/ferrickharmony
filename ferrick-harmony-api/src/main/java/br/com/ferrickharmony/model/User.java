@@ -35,6 +35,7 @@ public class User {
     private UserRole role;
 
     @CreatedDate
+    @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @LastModifiedDate
