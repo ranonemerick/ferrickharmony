@@ -8,6 +8,7 @@ import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.UserMapper;
 import br.com.ferrickharmony.model.User;
 import br.com.ferrickharmony.repository.UserRepository;
+import br.com.ferrickharmony.utils.EmailUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.UUID;
+
+import static br.com.ferrickharmony.utils.EmailUtils.normalizeEmail;
 
 @Service
 @RequiredArgsConstructor
@@ -106,10 +109,6 @@ public class UserService {
 
         user.setActive(false);
         userRepository.save(user);
-    }
-
-    private String normalizeEmail(String email) {
-        return email == null ? null : email.trim().toLowerCase();
     }
 
 }
