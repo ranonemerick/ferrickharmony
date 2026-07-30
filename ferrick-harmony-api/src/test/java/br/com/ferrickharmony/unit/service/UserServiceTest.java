@@ -1,7 +1,9 @@
 package br.com.ferrickharmony.unit.service;
 
+import br.com.ferrickharmony.dto.user.UserPasswordUpdateDTO;
 import br.com.ferrickharmony.dto.user.UserRequestDTO;
 import br.com.ferrickharmony.dto.user.UserResponseDTO;
+import br.com.ferrickharmony.dto.user.UserUpdateDTO;
 import br.com.ferrickharmony.enums.UserRole;
 import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.UserMapper;
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.*;
 public class UserServiceTest {
     
     private final String EMAIL = "test@email.com";
+    private final String UNNORMALIZED_EMAIL = "  TEST@Email.COM  ";
     private final UUID ID = UUID.randomUUID();
     private final LocalDateTime NOW = LocalDateTime.now();
     private final String PASSWORD = "abc123";
@@ -87,10 +90,7 @@ public class UserServiceTest {
     @Test
     void shouldNormalizeEmailWhenCreatingUser() {
         UserRequestDTO request = new UserRequestDTO(
-                "  TEST@Email.COM  ",
-                PASSWORD,
-                UserRole.ADMIN,
-                true
+                UNNORMALIZED_EMAIL, PASSWORD, UserRole.ADMIN, true
         );
 
         User user = createUser();
@@ -217,6 +217,205 @@ public class UserServiceTest {
 
         verify(userRepository).findById(ID);
         verify(userMapper, never()).toResponseDTO(any());
+    }
+
+    @Test
+    void shouldReturnUserWhenEmailExists() {
+        User user = createUser();
+        UserResponseDTO response = createUserResponse();
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(userMapper.toResponseDTO(user)).thenReturn(response);
+
+        assertEquals(response, userService.findByEmail(EMAIL));
+
+        verify(userRepository).findByEmail(EMAIL);
+        verify(userMapper).toResponseDTO(user);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenFindingUserWithNonExistingEmail() {
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(
+                EntityNotFoundException.class, () -> userService.findByEmail(EMAIL)
+        );
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository).findByEmail(EMAIL);
+        verify(userMapper, never()).toResponseDTO(any());
+    }
+
+    @Test
+    void shouldNormalizeEmailWhenFindingUserByEmail() {
+        User user = createUser();
+        UserResponseDTO response = createUserResponse();
+
+        when(userRepository.findByEmail(EMAIL)).thenReturn(Optional.of(user));
+        when(userMapper.toResponseDTO(user)).thenReturn(response);
+
+        UserResponseDTO result = userService.findByEmail(UNNORMALIZED_EMAIL);
+
+        assertNotNull(result);
+        assertEquals(EMAIL, result.email());
+
+        verify(userRepository).findByEmail(EMAIL);
+        verify(userMapper).toResponseDTO(user);
+    }
+
+    @Test
+    void shouldUpdateUserWhenUserExists() {
+        User user = createUser();
+        UserUpdateDTO updateDTO = new UserUpdateDTO(null, UserRole.PROFESSIONAL, false);
+        UserResponseDTO response = new UserResponseDTO(ID, EMAIL, UserRole.PROFESSIONAL, false, NOW, NOW);
+
+        when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDTO(user)).thenReturn(response);
+
+        UserResponseDTO result = userService.update(ID, updateDTO);
+
+        assertNotNull(result);
+        assertEquals(UserRole.PROFESSIONAL, result.role());
+        assertFalse(result.active());
+
+        verify(userRepository).findById(ID);
+        verify(userMapper).updateEntityFromRequest(user, updateDTO);
+        verify(userRepository).save(user);
+        verify(userMapper).toResponseDTO(user);
+    }
+
+    @Test
+    void shouldUpdateUserEmailWhenNewEmailIsAvailable() {
+        User user = createUser();
+        String newEmail = "new@email.com";
+        UserUpdateDTO updateDTO = new UserUpdateDTO(newEmail, null, true);
+        UserResponseDTO response = new UserResponseDTO(ID, newEmail, UserRole.ADMIN, true, NOW, NOW);
+
+        when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmailAndIdNot(newEmail, ID)).thenReturn(false);
+        when(userRepository.save(user)).thenReturn(user);
+        when(userMapper.toResponseDTO(user)).thenReturn(response);
+
+        UserResponseDTO result = userService.update(ID, updateDTO);
+
+        assertNotNull(result);
+        assertEquals(newEmail, result.email());
+
+        verify(userRepository).findById(ID);
+        verify(userRepository).existsByEmailAndIdNot(newEmail, ID);
+        verify(userMapper).updateEntityFromRequest(user, updateDTO);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingUserWithExistingEmail() {
+        User user = createUser();
+        String existingEmail = "existing@email.com";
+        UserUpdateDTO updateDTO = new UserUpdateDTO(existingEmail, null, true);
+
+        when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+        when(userRepository.existsByEmailAndIdNot(existingEmail, ID)).thenReturn(true);
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> userService.update(ID, updateDTO));
+
+        assertEquals("Email already exists", exception.getMessage());
+
+        verify(userRepository).findById(ID);
+        verify(userRepository).existsByEmailAndIdNot(existingEmail, ID);
+        verify(userMapper, never()).updateEntityFromRequest(any(), any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingNonExistingUser() {
+        UserUpdateDTO updateDTO = new UserUpdateDTO("new@email.com", UserRole.PROFESSIONAL, true);
+
+        when(userRepository.findById(ID)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> userService.update(ID, updateDTO));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository).findById(ID);
+        verify(userRepository, never()).existsByEmailAndIdNot(anyString(), any());
+        verify(userMapper, never()).updateEntityFromRequest(any(), any());
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldUpdateUserPasswordWhenUserExists() {
+        User user = createUser();
+        String newPassword = "newPassword123";
+        UserPasswordUpdateDTO passwordDTO = new UserPasswordUpdateDTO(newPassword);
+
+        when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+
+        userService.updatePassword(ID, passwordDTO);
+
+        assertEquals(newPassword, user.getPassword());
+        verify(userRepository).findById(ID);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenUpdatingPasswordForNonExistingUser() {
+        UserPasswordUpdateDTO passwordDTO = new UserPasswordUpdateDTO("newPassword123");
+
+        when(userRepository.findById(ID)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> userService.updatePassword(ID, passwordDTO));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository).findById(ID);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldDeactivateUserWhenUserIsActive() {
+        User user = createUser();
+
+        when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+
+        userService.deactivate(ID);
+
+        assertFalse(user.isActive());
+        verify(userRepository).findById(ID);
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeactivatingAlreadyInactiveUser() {
+        User user = createUser();
+        user.setActive(false);
+
+        when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+
+        BusinessException exception = assertThrows(BusinessException.class,
+                () -> userService.deactivate(ID));
+
+        assertEquals("User is already inactive", exception.getMessage());
+
+        verify(userRepository).findById(ID);
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    void shouldThrowExceptionWhenDeactivatingNonExistingUser() {
+        when(userRepository.findById(ID)).thenReturn(Optional.empty());
+
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
+                () -> userService.deactivate(ID));
+
+        assertEquals("User not found", exception.getMessage());
+
+        verify(userRepository).findById(ID);
+        verify(userRepository, never()).save(any());
     }
 
     private User createUser() {
