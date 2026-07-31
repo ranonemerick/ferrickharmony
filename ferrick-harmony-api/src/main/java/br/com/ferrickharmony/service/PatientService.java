@@ -8,7 +8,11 @@ import br.com.ferrickharmony.model.Patient;
 import br.com.ferrickharmony.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.UUID;
 
 import static br.com.ferrickharmony.utils.EmailUtils.normalizeEmail;
 
@@ -35,6 +39,28 @@ public class PatientService {
         patient.setEmail(sanitizedEmail);
         patient = patientRepository.save(patient);
         return patientMapper.toResponseDTO(patient);
+    }
+
+    public Page<PatientResponseDTO> listAll(Pageable pageable) {
+        return patientRepository.findAll(pageable)
+                .map(patientMapper::toResponseDTO);
+    }
+
+    public Page<PatientResponseDTO> findActivePatients(Pageable pageable) {
+        return patientRepository.findAllByActiveTrue(pageable)
+                .map(patientMapper::toResponseDTO);
+    }
+
+    public PatientResponseDTO findById(UUID id) {
+        return patientRepository.findById(id)
+                .map(patientMapper::toResponseDTO)
+                .orElseThrow(() -> new BusinessException("Patient not found"));
+    }
+
+    public PatientResponseDTO findByCpf(String cpf) {
+        return patientRepository.findByCpf(cpf)
+                .map(patientMapper::toResponseDTO)
+                .orElseThrow(() -> new BusinessException("Patient not found"));
     }
 
 }
