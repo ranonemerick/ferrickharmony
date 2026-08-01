@@ -8,12 +8,12 @@ import br.com.ferrickharmony.mapper.PatientMapper;
 import br.com.ferrickharmony.model.Patient;
 import br.com.ferrickharmony.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -44,22 +44,26 @@ public class PatientService {
         return patientMapper.toResponseDTO(patient);
     }
 
+    @Transactional(readOnly = true)
     public Page<PatientResponseDTO> listAll(Pageable pageable) {
         return patientRepository.findAll(pageable)
                 .map(patientMapper::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public Page<PatientResponseDTO> findActivePatients(Pageable pageable) {
         return patientRepository.findAllByActiveTrue(pageable)
                 .map(patientMapper::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public PatientResponseDTO findById(UUID id) {
         return patientRepository.findById(id)
                 .map(patientMapper::toResponseDTO)
                 .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
     }
 
+    @Transactional(readOnly = true)
     public PatientResponseDTO findByCpf(String cpf) {
         return patientRepository.findByCpf(cpf)
                 .map(patientMapper::toResponseDTO)
