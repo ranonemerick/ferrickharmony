@@ -61,4 +61,10 @@ public class PatientController {
         return ResponseEntity.ok().body(patient);
     }
 
+    @DeleteMapping("/deactivate/{id}")
+    public ResponseEntity<Void> deactivate(@PathVariable UUID id) {
+        patientService.deactivate(id);
+        return ResponseEntity.noContent().build();
+    }
+
 }

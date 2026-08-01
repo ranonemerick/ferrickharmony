@@ -87,4 +87,16 @@ public class PatientService {
         return patientMapper.toResponseDTO(patient);
     }
 
+    @Transactional
+    public void deactivate(UUID id) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+
+        if (!patient.isActive()) {
+            throw new BusinessException("Patient is already inactive");
+        }
+        patient.setActive(false);
+        patientRepository.save(patient);
+    }
+
 }
