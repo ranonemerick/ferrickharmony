@@ -2,6 +2,7 @@ package br.com.ferrickharmony.controller;
 
 import br.com.ferrickharmony.dto.patient.PatientRequestDTO;
 import br.com.ferrickharmony.dto.patient.PatientResponseDTO;
+import br.com.ferrickharmony.dto.patient.PatientUpdateDTO;
 import br.com.ferrickharmony.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -50,6 +51,13 @@ public class PatientController {
     @GetMapping("/cpf/{cpf}")
     public ResponseEntity<PatientResponseDTO> findByCpf(@PathVariable String cpf) {
         var patient = patientService.findByCpf(cpf);
+        return ResponseEntity.ok().body(patient);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<PatientResponseDTO> update(@PathVariable UUID id,
+                                                     @RequestBody @Valid PatientUpdateDTO patientUpdate) {
+        var patient = patientService.update(id, patientUpdate);
         return ResponseEntity.ok().body(patient);
     }
 

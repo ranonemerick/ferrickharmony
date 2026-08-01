@@ -2,15 +2,18 @@ package br.com.ferrickharmony.service;
 
 import br.com.ferrickharmony.dto.patient.PatientRequestDTO;
 import br.com.ferrickharmony.dto.patient.PatientResponseDTO;
+import br.com.ferrickharmony.dto.patient.PatientUpdateDTO;
 import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.PatientMapper;
 import br.com.ferrickharmony.model.Patient;
 import br.com.ferrickharmony.repository.PatientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -54,13 +57,34 @@ public class PatientService {
     public PatientResponseDTO findById(UUID id) {
         return patientRepository.findById(id)
                 .map(patientMapper::toResponseDTO)
-                .orElseThrow(() -> new BusinessException("Patient not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
     }
 
     public PatientResponseDTO findByCpf(String cpf) {
         return patientRepository.findByCpf(cpf)
                 .map(patientMapper::toResponseDTO)
-                .orElseThrow(() -> new BusinessException("Patient not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+    }
+
+    @Transactional
+    public PatientResponseDTO update(UUID id, PatientUpdateDTO patientUpdate) {
+        Patient patient = patientRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+
+        if (StringUtils.hasText(patientUpdate.email())) {
+            String sanitizedEmail = normalizeEmail(patientUpdate.email());
+
+            if (patientRepository.existsByEmailAndIdNot(sanitizedEmail, id)) {
+                throw new BusinessException("Email already exists");
+            }
+            patient.setEmail(sanitizedEmail);
+        }
+
+        patientMapper.updateEntityFromRequest(patient, patientUpdate);
+
+        patient = patientRepository.save(patient);
+
+        return patientMapper.toResponseDTO(patient);
     }
 
 }
