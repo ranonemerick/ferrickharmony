@@ -8,17 +8,16 @@ import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.UserMapper;
 import br.com.ferrickharmony.model.User;
 import br.com.ferrickharmony.repository.UserRepository;
-import br.com.ferrickharmony.utils.EmailUtils;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
+import static br.com.ferrickharmony.enums.ErrorKey.*;
 import static br.com.ferrickharmony.utils.EmailUtils.normalizeEmail;
 
 @Service
@@ -33,7 +32,7 @@ public class UserService {
         String sanitizedEmail = normalizeEmail(userRequest.email());
 
         if (userRepository.existsByEmail(sanitizedEmail)) {
-            throw new BusinessException("Email already exists");
+            throw new BusinessException(EMAIL_ALREADY_EXISTS.getKey());
         }
 
         User user = userMapper.toEntity(userRequest);
@@ -59,26 +58,26 @@ public class UserService {
     public UserResponseDTO findById(UUID id) {
         return userRepository.findById(id)
                 .map(userMapper::toResponseDTO)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND.getKey()));
     }
 
     @Transactional(readOnly = true)
     public UserResponseDTO findByEmail(String email) {
         return userRepository.findByEmail(normalizeEmail(email))
                 .map(userMapper::toResponseDTO)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND.getKey()));
     }
 
     @Transactional
     public UserResponseDTO update(UUID id, UserUpdateDTO userUpdate) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND.getKey()));
 
         if (userUpdate.email() != null && !userUpdate.email().isBlank()) {
             String sanitizedEmail = normalizeEmail(userUpdate.email());
 
             if (userRepository.existsByEmailAndIdNot(sanitizedEmail, id)) {
-                throw new BusinessException("Email already exists");
+                throw new BusinessException(EMAIL_ALREADY_EXISTS.getKey());
             }
             user.setEmail(sanitizedEmail);
         }
@@ -92,7 +91,7 @@ public class UserService {
     @Transactional
     public void updatePassword(UUID id, UserPasswordUpdateDTO passwordUpdate) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND.getKey()));
 
         user.setPassword(passwordUpdate.password());
         userRepository.save(user);
@@ -101,10 +100,10 @@ public class UserService {
     @Transactional
     public void deactivate(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND.getKey()));
 
         if (!user.isActive()) {
-            throw new BusinessException("User is already inactive");
+            throw new BusinessException(USER_ALREADY_INACTIVE.getKey());
         }
 
         user.setActive(false);

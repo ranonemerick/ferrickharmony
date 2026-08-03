@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
+import static br.com.ferrickharmony.enums.ErrorKey.*;
 import static br.com.ferrickharmony.utils.EmailUtils.normalizeEmail;
 
 @Service
@@ -30,12 +31,12 @@ public class PatientService {
     public PatientResponseDTO create(PatientRequestDTO patientRequest) {
 
         if(patientRepository.existsByCpf(patientRequest.cpf())) {
-            throw new BusinessException("Patient with CPF " + patientRequest.cpf() + " already exists");
+            throw new BusinessException(PATIENT_CPF_EXISTS.getKey(), patientRequest.cpf());
         }
 
         String sanitizedEmail = normalizeEmail(patientRequest.email());
         if (patientRepository.existsByEmail(sanitizedEmail)) {
-            throw new BusinessException("Email already exists");
+            throw new BusinessException(EMAIL_ALREADY_EXISTS.getKey());
         }
 
         Patient patient = patientMapper.toEntity(patientRequest);
@@ -60,26 +61,26 @@ public class PatientService {
     public PatientResponseDTO findById(UUID id) {
         return patientRepository.findById(id)
                 .map(patientMapper::toResponseDTO)
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+                .orElseThrow(() -> new EntityNotFoundException(PATIENT_NOT_FOUND.getKey()));
     }
 
     @Transactional(readOnly = true)
     public PatientResponseDTO findByCpf(String cpf) {
         return patientRepository.findByCpf(cpf)
                 .map(patientMapper::toResponseDTO)
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+                .orElseThrow(() -> new EntityNotFoundException(PATIENT_NOT_FOUND.getKey()));
     }
 
     @Transactional
     public PatientResponseDTO update(UUID id, PatientUpdateDTO patientUpdate) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+                .orElseThrow(() -> new EntityNotFoundException(PATIENT_NOT_FOUND.getKey()));
 
         if (StringUtils.hasText(patientUpdate.email())) {
             String sanitizedEmail = normalizeEmail(patientUpdate.email());
 
             if (patientRepository.existsByEmailAndIdNot(sanitizedEmail, id)) {
-                throw new BusinessException("Email already exists");
+                throw new BusinessException(EMAIL_ALREADY_EXISTS.getKey());
             }
             patient.setEmail(sanitizedEmail);
         }
@@ -94,10 +95,10 @@ public class PatientService {
     @Transactional
     public void deactivate(UUID id) {
         Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Patient not found"));
+                .orElseThrow(() -> new EntityNotFoundException(PATIENT_NOT_FOUND.getKey()));
 
         if (!patient.isActive()) {
-            throw new BusinessException("Patient is already inactive");
+            throw new BusinessException(PATIENT_ALREADY_INACTIVE.getKey());
         }
         patient.setActive(false);
         patientRepository.save(patient);

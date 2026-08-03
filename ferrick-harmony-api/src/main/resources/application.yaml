@@ -1,3 +1,7 @@
 spring:
   application:
     name: ferrick-harmony-api
+
+  messages:
+    basename: i18n/messages
+    encoding: UTF-8

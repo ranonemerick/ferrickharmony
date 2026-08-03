@@ -4,7 +4,10 @@ import br.com.ferrickharmony.exception.dto.ApiErrorResponse;
 import br.com.ferrickharmony.exception.dto.DataErrorValidation;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,15 +15,20 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private static final String RESOURCE_NOT_FOUND = "Resource not found.";
     private static final String VALIDATION_ERROR = "Validation error in the provided data.";
     private static final String INTERNAL_ERROR = "An internal server error occurred. Please try again later.";
+
+    private final MessageSource messageSource;
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ApiErrorResponse> handleEntityNotFound(HttpServletRequest request) {
@@ -50,16 +58,23 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+
     @ExceptionHandler(BusinessException.class)
-    public ResponseEntity<ApiErrorResponse> handleBusinessException(BusinessException ex, HttpServletRequest request) {
-        ApiErrorResponse response = buildErrorResponse(
-                HttpStatus.BAD_REQUEST,
+    public ResponseEntity<Map<String, Object>> handleBusinessException(BusinessException ex) {
+        String translatedMessage = messageSource.getMessage(
                 ex.getMessage(),
-                request.getRequestURI(),
-                null
+                ex.getArgs(),
+                ex.getMessage(),
+                LocaleContextHolder.getLocale()
         );
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad Request");
+        body.put("message", translatedMessage);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(Exception.class)
