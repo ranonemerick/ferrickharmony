@@ -26,7 +26,7 @@ public class PatientController {
     public ResponseEntity<PatientResponseDTO> save(@RequestBody @Valid PatientRequestDTO patientRequest,
                                                    UriComponentsBuilder uriBuilder) {
         PatientResponseDTO patientResponse =  patientService.create(patientRequest);
-        URI uri = uriBuilder.path("/patients/{id}").buildAndExpand(patientRequest.cpf()).toUri();
+        URI uri = uriBuilder.path("/patients/{id}").buildAndExpand(patientResponse.id()).toUri();
         return ResponseEntity.created(uri).body(patientResponse);
     }
 

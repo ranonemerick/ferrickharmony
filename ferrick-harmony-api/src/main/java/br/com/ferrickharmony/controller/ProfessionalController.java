@@ -26,7 +26,7 @@ public class ProfessionalController {
     public ResponseEntity<ProfessionalResponseDTO> save(@RequestBody @Valid ProfessionalRequestDTO professionalRequestDTO,
                                                         UriComponentsBuilder uriBuilder) {
         ProfessionalResponseDTO professionalResponse = professionalService.create(professionalRequestDTO);
-        URI uri = uriBuilder.path("/professionals/{id}").buildAndExpand(professionalResponse.cpf()).toUri();
+        URI uri = uriBuilder.path("/professionals/{id}").buildAndExpand(professionalResponse.id()).toUri();
         return ResponseEntity.created(uri).body(professionalResponse);
     }
 
