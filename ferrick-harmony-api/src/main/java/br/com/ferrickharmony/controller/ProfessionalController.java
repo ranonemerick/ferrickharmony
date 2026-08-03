@@ -2,7 +2,6 @@ package br.com.ferrickharmony.controller;
 
 import br.com.ferrickharmony.dto.professional.ProfessionalRequestDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalResponseDTO;
-import br.com.ferrickharmony.model.Professional;
 import br.com.ferrickharmony.service.ProfessionalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

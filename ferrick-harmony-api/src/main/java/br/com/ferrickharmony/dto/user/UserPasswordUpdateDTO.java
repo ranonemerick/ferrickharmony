@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record UserPasswordUpdateDTO(
-        @NotBlank(message = "The new password is required")
-        @Size(min = 6, message = "The password must have at least 6 characters")
+        @NotBlank(message = "{error.user.password.required}")
+        @Size(min = 6, message = "{error.user.password.size}")
         String password
 ) {}

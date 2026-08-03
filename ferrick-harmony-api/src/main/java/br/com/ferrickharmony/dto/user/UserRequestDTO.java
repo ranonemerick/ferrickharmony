@@ -7,15 +7,15 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record UserRequestDTO(
-        @NotBlank(message = "Email is required")
-        @Email(message = "Invalid email format")
+        @NotBlank(message = "{error.user.email.required}")
+        @Email(message = "{error.user.email.invalid}")
         String email,
 
-        @NotBlank(message = "Password is required")
-        @Size(min = 6, message = "Password must be at least 6 characters long")
+        @NotBlank(message = "{error.user.password.required}")
+        @Size(min = 6, message = "{error.user.password.size}")
         String password,
 
-        @NotNull(message = "Role is required")
+        @NotNull(message = "{error.user.role.required}")
         UserRole role,
 
         boolean active

@@ -8,25 +8,25 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 public record PatientRequestDTO(
-        @NotBlank(message = "Name is required")
+        @NotBlank(message = "{error.patient.name.required}")
         String name,
 
-        @NotBlank(message = "CPF is required")
-        @Size(min = 11, max = 11, message = "CPF must have exactly 11 digits")
+        @NotBlank(message = "{error.patient.cpf.required}")
+        @Size(min = 11, max = 11, message = "{error.patient.cpf.size}")
         String cpf,
 
-        @Email(message = "Invalid email format")
+        @Email(message = "{error.patient.email.invalid}")
         String email,
 
-        @NotNull(message = "Birth date is required")
+        @NotNull(message = "{error.patient.birthDate.required}")
         LocalDate birthDate,
 
-        @NotBlank(message = "Phone is required")
+        @NotBlank(message = "{error.patient.phone.required}")
         String phone,
 
         String secondaryPhone,
 
-        @NotBlank(message = "ZIP code is required")
+        @NotBlank(message = "{error.patient.cep.required}")
         String cep,
 
         String street,

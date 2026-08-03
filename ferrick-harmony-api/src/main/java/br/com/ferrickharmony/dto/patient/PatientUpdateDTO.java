@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public record PatientUpdateDTO(
         String name,
 
-        @Email(message = "Invalid email format")
+        @Email(message = "{error.patient.email.invalid}")
         String email,
 
         LocalDate birthDate,
