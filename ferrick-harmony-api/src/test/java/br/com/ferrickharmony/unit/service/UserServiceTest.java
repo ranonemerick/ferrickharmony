@@ -26,12 +26,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static br.com.ferrickharmony.enums.ErrorKey.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
-    
+
     private final String EMAIL = "test@email.com";
     private final String UNNORMALIZED_EMAIL = "  TEST@Email.COM  ";
     private final UUID ID = UUID.randomUUID();
@@ -80,7 +81,7 @@ public class UserServiceTest {
 
         when(userRepository.existsByEmail(EMAIL)).thenReturn(true);
 
-        assertEquals("Email already exists",
+        assertEquals(EMAIL_ALREADY_EXISTS.getKey(),
                 assertThrows(BusinessException.class, () -> userService.create(request)).getMessage());
 
         verify(userRepository).existsByEmail(EMAIL);
@@ -213,7 +214,7 @@ public class UserServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> userService.findById(ID));
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(USER_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(userRepository).findById(ID);
         verify(userMapper, never()).toResponseDTO(any());
@@ -241,7 +242,7 @@ public class UserServiceTest {
                 EntityNotFoundException.class, () -> userService.findByEmail(EMAIL)
         );
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(USER_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(userRepository).findByEmail(EMAIL);
         verify(userMapper, never()).toResponseDTO(any());
@@ -321,7 +322,7 @@ public class UserServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> userService.update(ID, updateDTO));
 
-        assertEquals("Email already exists", exception.getMessage());
+        assertEquals(EMAIL_ALREADY_EXISTS.getKey(), exception.getMessage());
 
         verify(userRepository).findById(ID);
         verify(userRepository).existsByEmailAndIdNot(existingEmail, ID);
@@ -338,7 +339,7 @@ public class UserServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> userService.update(ID, updateDTO));
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(USER_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(userRepository).findById(ID);
         verify(userRepository, never()).existsByEmailAndIdNot(anyString(), any());
@@ -370,7 +371,7 @@ public class UserServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> userService.updatePassword(ID, passwordDTO));
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(USER_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(userRepository).findById(ID);
         verify(userRepository, never()).save(any());
@@ -399,7 +400,7 @@ public class UserServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> userService.deactivate(ID));
 
-        assertEquals("User is already inactive", exception.getMessage());
+        assertEquals(USER_ALREADY_INACTIVE.getKey(), exception.getMessage());
 
         verify(userRepository).findById(ID);
         verify(userRepository, never()).save(any());
@@ -412,7 +413,7 @@ public class UserServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> userService.deactivate(ID));
 
-        assertEquals("User not found", exception.getMessage());
+        assertEquals(USER_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(userRepository).findById(ID);
         verify(userRepository, never()).save(any());

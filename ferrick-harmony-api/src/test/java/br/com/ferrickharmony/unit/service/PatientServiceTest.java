@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static br.com.ferrickharmony.enums.ErrorKey.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -92,7 +93,7 @@ public class PatientServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> patientService.create(request));
 
-        assertTrue(exception.getMessage().contains("already exists"));
+        assertEquals(PATIENT_CPF_EXISTS.getKey(), exception.getMessage());
 
         verify(patientRepository).existsByCpf(CPF);
         verify(patientRepository, never()).existsByEmail(anyString());
@@ -111,7 +112,7 @@ public class PatientServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> patientService.create(request));
 
-        assertEquals("Email already exists", exception.getMessage());
+        assertEquals(EMAIL_ALREADY_EXISTS.getKey(), exception.getMessage());
 
         verify(patientRepository).existsByCpf(CPF);
         verify(patientRepository).existsByEmail(EMAIL);
@@ -242,7 +243,7 @@ public class PatientServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> patientService.findById(ID));
 
-        assertEquals("Patient not found", exception.getMessage());
+        assertEquals(PATIENT_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(patientRepository).findById(ID);
         verify(patientMapper, never()).toResponseDTO(any());
@@ -270,7 +271,7 @@ public class PatientServiceTest {
                 EntityNotFoundException.class, () -> patientService.findByCpf(CPF)
         );
 
-        assertEquals("Patient not found", exception.getMessage());
+        assertEquals(PATIENT_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(patientRepository).findByCpf(CPF);
         verify(patientMapper, never()).toResponseDTO(any());
@@ -343,7 +344,7 @@ public class PatientServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> patientService.update(ID, updateDTO));
 
-        assertEquals("Email already exists", exception.getMessage());
+        assertEquals(EMAIL_ALREADY_EXISTS.getKey(), exception.getMessage());
 
         verify(patientRepository).findById(ID);
         verify(patientRepository).existsByEmailAndIdNot(existingEmail, ID);
@@ -362,7 +363,7 @@ public class PatientServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> patientService.update(ID, updateDTO));
 
-        assertEquals("Patient not found", exception.getMessage());
+        assertEquals(PATIENT_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(patientRepository).findById(ID);
         verify(patientRepository, never()).existsByEmailAndIdNot(anyString(), any());
@@ -393,7 +394,7 @@ public class PatientServiceTest {
         BusinessException exception = assertThrows(BusinessException.class,
                 () -> patientService.deactivate(ID));
 
-        assertEquals("Patient is already inactive", exception.getMessage());
+        assertEquals(PATIENT_ALREADY_INACTIVE.getKey(), exception.getMessage());
 
         verify(patientRepository).findById(ID);
         verify(patientRepository, never()).save(any());
@@ -406,7 +407,7 @@ public class PatientServiceTest {
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class,
                 () -> patientService.deactivate(ID));
 
-        assertEquals("Patient not found", exception.getMessage());
+        assertEquals(PATIENT_NOT_FOUND.getKey(), exception.getMessage());
 
         verify(patientRepository).findById(ID);
         verify(patientRepository, never()).save(any());
