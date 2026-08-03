@@ -12,7 +12,10 @@ public enum ErrorKey {
     /* Patient */
     PATIENT_NOT_FOUND("error.patient.not.found"),
     PATIENT_ALREADY_INACTIVE("error.patient.already.inactive"),
-    PATIENT_CPF_EXISTS("error.patient.cpf.exists");
+    PATIENT_CPF_EXISTS("error.patient.cpf.exists"),
+
+    /* Security */
+    INVALID_JWT_TOKEN("error.invalid.jwt.token");
 
     private final String key;
 
