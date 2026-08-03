@@ -14,6 +14,12 @@ public enum ErrorKey {
     PATIENT_ALREADY_INACTIVE("error.patient.already.inactive"),
     PATIENT_CPF_EXISTS("error.patient.cpf.exists"),
 
+    /* Professional */
+    PROFESSIONAL_CPF_EXISTS("error.professional.cpf.exists"),
+    PROFESSIONAL_DOCUMENT_EXISTS("error.professional.document.exists"),
+    PROFESSIONAL_EMAIL_EXISTS("error.professional.email.exists"),
+    PROFESSIONAL_NOT_FOUND("error.professional.not.found"),
+
     /* Security */
     INVALID_JWT_TOKEN("error.invalid.jwt.token");
 
