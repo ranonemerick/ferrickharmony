@@ -2,8 +2,10 @@ package br.com.ferrickharmony.mapper;
 
 import br.com.ferrickharmony.dto.professional.ProfessionalRequestDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalResponseDTO;
+import br.com.ferrickharmony.dto.professional.ProfessionalUpdateDTO;
 import br.com.ferrickharmony.model.Professional;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 @Component
 public class ProfessionalMapper {
@@ -37,4 +39,29 @@ public class ProfessionalMapper {
         );
     }
 
+    public void updateEntityFromRequest(Professional entity, ProfessionalUpdateDTO dto) {
+        if (dto == null || entity == null) {
+            return;
+        }
+
+        if (StringUtils.hasText(dto.name())) {
+            entity.setName(dto.name());
+        }
+
+        if (StringUtils.hasText(dto.cpf())) {
+            entity.setCpf(dto.cpf());
+        }
+
+        if (StringUtils.hasText(dto.document())) {
+            entity.setDocument(dto.document());
+        }
+
+        if (StringUtils.hasText(dto.phone())) {
+            entity.setPhone(dto.phone());
+        }
+
+        if (dto.active() != null) {
+            entity.setActive(dto.active());
+        }
+    }
 }

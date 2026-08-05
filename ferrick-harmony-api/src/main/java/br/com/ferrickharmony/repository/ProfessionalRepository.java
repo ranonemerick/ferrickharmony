@@ -12,6 +12,9 @@ import java.util.UUID;
 public interface ProfessionalRepository extends JpaRepository<Professional, UUID> {
     boolean existsByCpf(String cpf);
     boolean existsByEmail(String sanitizedEmail);
+    boolean existsByEmailAndIdNot(String email, UUID id);
+    boolean existsByCpfAndIdNot(String cpf, UUID id);
+    boolean existsByDocumentAndIdNot(String document, UUID id);
     Page<Professional> findAllByActiveTrue(Pageable pageable);
     Optional<Professional> findByCpf(String cpf);
 }

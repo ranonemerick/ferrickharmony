@@ -2,6 +2,7 @@ package br.com.ferrickharmony.controller;
 
 import br.com.ferrickharmony.dto.professional.ProfessionalRequestDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalResponseDTO;
+import br.com.ferrickharmony.dto.professional.ProfessionalUpdateDTO;
 import br.com.ferrickharmony.service.ProfessionalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -51,6 +52,13 @@ public class ProfessionalController {
     public ResponseEntity<ProfessionalResponseDTO> findByCpf(@PathVariable String cpf) {
         var professional = professionalService.findByCpf(cpf);
         return ResponseEntity.ok().body(professional);
+    }
+
+    @PutMapping("/update/{id}")
+    public ResponseEntity<ProfessionalResponseDTO> update(@PathVariable("id") UUID id,
+                                                          @RequestBody @Valid ProfessionalUpdateDTO professionalUpdate) {
+        var professionalResponse = professionalService.update(id, professionalUpdate);
+        return ResponseEntity.ok().body(professionalResponse);
     }
 
 }
