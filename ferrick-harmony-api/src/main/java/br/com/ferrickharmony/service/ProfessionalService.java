@@ -101,4 +101,15 @@ public class ProfessionalService {
         return professionalMapper.toResponseDTO(professional);
     }
 
+    @Transactional
+    public void deactivate(UUID id) {
+        Professional professional = professionalRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(PROFESSIONAL_NOT_FOUND.getKey()));
+
+        if(!professional.isActive()) {
+            throw new BusinessException(PROFESSIONAL_ALREADY_INACTIVE.getKey());
+        }
+        professional.setActive(false);
+    }
+
 }

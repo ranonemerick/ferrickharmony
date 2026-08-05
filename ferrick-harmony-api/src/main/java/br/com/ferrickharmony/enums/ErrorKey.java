@@ -19,6 +19,7 @@ public enum ErrorKey {
     PROFESSIONAL_DOCUMENT_EXISTS("error.professional.document.exists"),
     PROFESSIONAL_EMAIL_EXISTS("error.professional.email.exists"),
     PROFESSIONAL_NOT_FOUND("error.professional.not.found"),
+    PROFESSIONAL_ALREADY_INACTIVE("error.professional.already.inactive"),
 
     /* Security */
     INVALID_JWT_TOKEN("error.invalid.jwt.token");

@@ -55,10 +55,16 @@ public class ProfessionalController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<ProfessionalResponseDTO> update(@PathVariable("id") UUID id,
+    public ResponseEntity<ProfessionalResponseDTO> update(@PathVariable UUID id,
                                                           @RequestBody @Valid ProfessionalUpdateDTO professionalUpdate) {
         var professionalResponse = professionalService.update(id, professionalUpdate);
         return ResponseEntity.ok().body(professionalResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ProfessionalResponseDTO> delete(@PathVariable UUID id) {
+        professionalService.deactivate(id);
+        return ResponseEntity.noContent().build();
     }
 
 }
