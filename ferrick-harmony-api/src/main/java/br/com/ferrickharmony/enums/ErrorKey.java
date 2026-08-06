@@ -25,7 +25,8 @@ public enum ErrorKey {
     INVALID_JWT_TOKEN("error.invalid.jwt.token"),
 
     /* Appointment */
-    APPOINTMENT_CONFLICT("error.appointment.conflict"),;
+    APPOINTMENT_CONFLICT("error.appointment.conflict"),
+    APPOINTMENT_NOT_FOUND("error.appointment.not.found");
 
     private final String key;
 

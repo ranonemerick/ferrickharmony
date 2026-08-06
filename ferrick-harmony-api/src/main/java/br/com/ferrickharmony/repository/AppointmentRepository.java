@@ -1,11 +1,17 @@
 package br.com.ferrickharmony.repository;
 
+import br.com.ferrickharmony.enums.AppointmentStatus;
 import br.com.ferrickharmony.model.Appointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {
-    boolean existsByProfessionalIdAndAppointmentDate(UUID id, LocalDateTime localDateTime);
-}
+    public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {
+        boolean existsByProfessionalIdAndAppointmentDate(UUID id, LocalDateTime localDateTime);
+        Page<Appointment> findByPatientId(UUID patientId, Pageable pageable);
+        Page<Appointment> findByProfessionalId(UUID professionalId, Pageable pageable);
+        Page<Appointment> findByStatus(AppointmentStatus status, Pageable pageable);
+    }
