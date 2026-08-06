@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
     public interface AppointmentRepository extends JpaRepository<Appointment, UUID> {
-        boolean existsByProfessionalIdAndAppointmentDate(UUID id, LocalDateTime localDateTime);
+        boolean existsByProfessionalIdAndAppointmentDateAndStatusNot(UUID professionalId, LocalDateTime appointmentDate, AppointmentStatus status);
         Page<Appointment> findByPatientId(UUID patientId, Pageable pageable);
         Page<Appointment> findByProfessionalId(UUID professionalId, Pageable pageable);
         Page<Appointment> findByStatus(AppointmentStatus status, Pageable pageable);

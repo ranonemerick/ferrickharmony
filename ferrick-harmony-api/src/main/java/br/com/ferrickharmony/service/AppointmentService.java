@@ -51,7 +51,8 @@ public class AppointmentService {
             throw new BusinessException(PROFESSIONAL_ALREADY_INACTIVE.getKey());
         }
 
-        if (appointmentRepository.existsByProfessionalIdAndAppointmentDate(professional.getId(), request.appointmentDate())) {
+        if (appointmentRepository.existsByProfessionalIdAndAppointmentDateAndStatusNot(professional.getId(),
+                request.appointmentDate(), CANCELED)) {
             throw new BusinessException(APPOINTMENT_CONFLICT.getKey());
         }
 
