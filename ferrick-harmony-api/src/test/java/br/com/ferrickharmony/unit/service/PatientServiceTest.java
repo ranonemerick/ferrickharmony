@@ -298,7 +298,6 @@ public class PatientServiceTest {
         assertFalse(result.active());
 
         verify(patientRepository).findById(ID);
-        verify(patientMapper).updateEntityFromRequest(patient, updateDTO);
         verify(patientRepository).save(patient);
         verify(patientMapper).toResponseDTO(patient);
     }
@@ -326,7 +325,6 @@ public class PatientServiceTest {
 
         verify(patientRepository).findById(ID);
         verify(patientRepository).existsByEmailAndIdNot(newEmail, ID);
-        verify(patientMapper).updateEntityFromRequest(patient, updateDTO);
         verify(patientRepository).save(patient);
     }
 
@@ -348,7 +346,6 @@ public class PatientServiceTest {
 
         verify(patientRepository).findById(ID);
         verify(patientRepository).existsByEmailAndIdNot(existingEmail, ID);
-        verify(patientMapper, never()).updateEntityFromRequest(any(), any());
         verify(patientRepository, never()).save(any());
     }
 
@@ -367,7 +364,6 @@ public class PatientServiceTest {
 
         verify(patientRepository).findById(ID);
         verify(patientRepository, never()).existsByEmailAndIdNot(anyString(), any());
-        verify(patientMapper, never()).updateEntityFromRequest(any(), any());
         verify(patientRepository, never()).save(any());
     }
 

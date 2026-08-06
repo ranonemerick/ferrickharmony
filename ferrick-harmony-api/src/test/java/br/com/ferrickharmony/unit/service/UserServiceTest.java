@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,12 +39,16 @@ public class UserServiceTest {
     private final UUID ID = UUID.randomUUID();
     private final LocalDateTime NOW = LocalDateTime.now();
     private final String PASSWORD = "abc123";
+    private final String ENCODED_PASSWORD = "encoded_abc123";
 
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @InjectMocks
     private UserService userService;
@@ -57,6 +62,7 @@ public class UserServiceTest {
         UserResponseDTO response = new UserResponseDTO(ID, EMAIL, UserRole.ADMIN, true, NOW, NOW);
 
         when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userMapper.toEntity(request)).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponseDTO(user)).thenReturn(response);
@@ -70,6 +76,7 @@ public class UserServiceTest {
         assertTrue(result.active());
 
         verify(userRepository).existsByEmail(EMAIL);
+        verify(passwordEncoder).encode(PASSWORD);
         verify(userMapper).toEntity(request);
         verify(userRepository).save(user);
         verify(userMapper).toResponseDTO(user);
@@ -98,6 +105,7 @@ public class UserServiceTest {
         UserResponseDTO response = createUserResponse();
 
         when(userRepository.existsByEmail(EMAIL)).thenReturn(false);
+        when(passwordEncoder.encode(PASSWORD)).thenReturn(ENCODED_PASSWORD);
         when(userMapper.toEntity(any())).thenReturn(user);
         when(userRepository.save(user)).thenReturn(user);
         when(userMapper.toResponseDTO(user)).thenReturn(response);
@@ -282,7 +290,6 @@ public class UserServiceTest {
         assertFalse(result.active());
 
         verify(userRepository).findById(ID);
-        verify(userMapper).updateEntityFromRequest(user, updateDTO);
         verify(userRepository).save(user);
         verify(userMapper).toResponseDTO(user);
     }
@@ -306,7 +313,6 @@ public class UserServiceTest {
 
         verify(userRepository).findById(ID);
         verify(userRepository).existsByEmailAndIdNot(newEmail, ID);
-        verify(userMapper).updateEntityFromRequest(user, updateDTO);
         verify(userRepository).save(user);
     }
 
@@ -326,7 +332,6 @@ public class UserServiceTest {
 
         verify(userRepository).findById(ID);
         verify(userRepository).existsByEmailAndIdNot(existingEmail, ID);
-        verify(userMapper, never()).updateEntityFromRequest(any(), any());
         verify(userRepository, never()).save(any());
     }
 
@@ -343,7 +348,6 @@ public class UserServiceTest {
 
         verify(userRepository).findById(ID);
         verify(userRepository, never()).existsByEmailAndIdNot(anyString(), any());
-        verify(userMapper, never()).updateEntityFromRequest(any(), any());
         verify(userRepository, never()).save(any());
     }
 
@@ -351,14 +355,17 @@ public class UserServiceTest {
     void shouldUpdateUserPasswordWhenUserExists() {
         User user = createUser();
         String newPassword = "newPassword123";
+        String encodedNewPassword = "encoded_newPassword123";
         UserPasswordUpdateDTO passwordDTO = new UserPasswordUpdateDTO(newPassword);
 
         when(userRepository.findById(ID)).thenReturn(Optional.of(user));
+        when(passwordEncoder.encode(newPassword)).thenReturn(encodedNewPassword);
 
         userService.updatePassword(ID, passwordDTO);
 
-        assertEquals(newPassword, user.getPassword());
+        assertEquals(encodedNewPassword, user.getPassword());
         verify(userRepository).findById(ID);
+        verify(passwordEncoder).encode(newPassword);
         verify(userRepository).save(user);
     }
 
