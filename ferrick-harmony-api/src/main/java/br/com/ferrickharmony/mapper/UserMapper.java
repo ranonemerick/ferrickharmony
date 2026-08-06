@@ -2,9 +2,9 @@ package br.com.ferrickharmony.mapper;
 
 import br.com.ferrickharmony.dto.user.UserRequestDTO;
 import br.com.ferrickharmony.dto.user.UserResponseDTO;
-import br.com.ferrickharmony.dto.user.UserUpdateDTO;
 import br.com.ferrickharmony.model.User;
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -13,9 +13,6 @@ public interface UserMapper {
     User toEntity(UserRequestDTO dto);
 
     UserResponseDTO toResponseDTO(User entity);
-
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    void updateEntityFromRequest(UserUpdateDTO dto, @MappingTarget User entity);
 
 }
 
