@@ -33,6 +33,10 @@ public class ProfessionalService {
             throw new BusinessException(PROFESSIONAL_CPF_EXISTS.getKey(), professionalRequest.cpf());
         }
 
+        if(professionalRepository.existsByDocument(professionalRequest.document())) {
+            throw new BusinessException(PROFESSIONAL_DOCUMENT_EXISTS.getKey());
+        }
+
         String sanitizedEmail = normalizeEmail(professionalRequest.email());
         if (professionalRepository.existsByEmail(sanitizedEmail)) {
             throw new BusinessException(EMAIL_ALREADY_EXISTS.getKey());
@@ -110,6 +114,7 @@ public class ProfessionalService {
             throw new BusinessException(PROFESSIONAL_ALREADY_INACTIVE.getKey());
         }
         professional.setActive(false);
+        professionalRepository.save(professional);
     }
 
 }
