@@ -299,7 +299,6 @@ public class ProfessionalServiceTest {
         assertFalse(result.active());
 
         verify(professionalRepository).findById(ID);
-        verify(professionalMapper).updateEntityFromRequest(professional, updateDTO);
         verify(professionalRepository).save(professional);
         verify(professionalMapper).toResponseDTO(professional);
     }
@@ -327,7 +326,6 @@ public class ProfessionalServiceTest {
 
         verify(professionalRepository).findById(ID);
         verify(professionalRepository).existsByEmailAndIdNot(newEmail, ID);
-        verify(professionalMapper).updateEntityFromRequest(professional, updateDTO);
         verify(professionalRepository).save(professional);
     }
 
@@ -349,7 +347,6 @@ public class ProfessionalServiceTest {
 
         verify(professionalRepository).findById(ID);
         verify(professionalRepository).existsByEmailAndIdNot(existingEmail, ID);
-        verify(professionalMapper, never()).updateEntityFromRequest(any(), any());
         verify(professionalRepository, never()).save(any());
     }
 
@@ -371,7 +368,6 @@ public class ProfessionalServiceTest {
 
         verify(professionalRepository).findById(ID);
         verify(professionalRepository).existsByCpfAndIdNot(existingCpf, ID);
-        verify(professionalMapper, never()).updateEntityFromRequest(any(), any());
         verify(professionalRepository, never()).save(any());
     }
 
@@ -393,7 +389,6 @@ public class ProfessionalServiceTest {
 
         verify(professionalRepository).findById(ID);
         verify(professionalRepository).existsByDocumentAndIdNot(existingDocument, ID);
-        verify(professionalMapper, never()).updateEntityFromRequest(any(), any());
         verify(professionalRepository, never()).save(any());
     }
 
@@ -412,7 +407,6 @@ public class ProfessionalServiceTest {
 
         verify(professionalRepository).findById(ID);
         verify(professionalRepository, never()).existsByEmailAndIdNot(anyString(), any());
-        verify(professionalMapper, never()).updateEntityFromRequest(any(), any());
         verify(professionalRepository, never()).save(any());
     }
 

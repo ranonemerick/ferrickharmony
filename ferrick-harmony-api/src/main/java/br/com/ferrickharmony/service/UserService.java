@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
@@ -85,10 +86,23 @@ public class UserService {
             user.setEmail(sanitizedEmail);
         }
 
-        userMapper.updateEntityFromRequest(user, userUpdate);
+        updateEntityFromRequest(user, userUpdate);
         user = userRepository.save(user);
 
         return userMapper.toResponseDTO(user);
+    }
+
+    private void updateEntityFromRequest(User entity, UserUpdateDTO dto) {
+        if(dto == null || entity == null) return;
+
+        if(StringUtils.hasText(dto.email())) {
+            entity.setEmail(dto.email());
+        }
+
+        if(dto.role() != null) {
+            entity.setRole(dto.role());
+        }
+        entity.setActive(dto.active());
     }
 
     @Transactional
@@ -96,7 +110,8 @@ public class UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(USER_NOT_FOUND.getKey()));
 
-        user.setPassword(passwordUpdate.password());
+        String passwordEncode = passwordEncoder.encode(passwordUpdate.password());
+        user.setPassword(passwordEncode);
         userRepository.save(user);
     }
 

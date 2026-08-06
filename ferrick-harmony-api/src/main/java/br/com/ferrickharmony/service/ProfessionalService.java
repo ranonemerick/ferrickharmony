@@ -98,11 +98,35 @@ public class ProfessionalService {
             throw new BusinessException(PROFESSIONAL_DOCUMENT_EXISTS.getKey());
         }
 
-        professionalMapper.updateEntityFromRequest(professional, professionalUpdate);
+        updateEntityFromRequest(professional, professionalUpdate);
 
         professional = professionalRepository.save(professional);
 
         return professionalMapper.toResponseDTO(professional);
+    }
+
+    private void updateEntityFromRequest(Professional entity, ProfessionalUpdateDTO dto) {
+        if (dto == null || entity == null) return;
+
+        if (StringUtils.hasText(dto.name())) {
+            entity.setName(dto.name());
+        }
+
+        if (StringUtils.hasText(dto.cpf())) {
+            entity.setCpf(dto.cpf());
+        }
+
+        if (StringUtils.hasText(dto.document())) {
+            entity.setDocument(dto.document());
+        }
+
+        if (StringUtils.hasText(dto.phone())) {
+            entity.setPhone(dto.phone());
+        }
+
+        if (dto.active() != null) {
+            entity.setActive(dto.active());
+        }
     }
 
     @Transactional
