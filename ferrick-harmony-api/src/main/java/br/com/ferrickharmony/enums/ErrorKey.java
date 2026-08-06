@@ -22,7 +22,10 @@ public enum ErrorKey {
     PROFESSIONAL_ALREADY_INACTIVE("error.professional.already.inactive"),
 
     /* Security */
-    INVALID_JWT_TOKEN("error.invalid.jwt.token");
+    INVALID_JWT_TOKEN("error.invalid.jwt.token"),
+
+    /* Appointment */
+    APPOINTMENT_CONFLICT("error.appointment.conflict"),;
 
     private final String key;
 
