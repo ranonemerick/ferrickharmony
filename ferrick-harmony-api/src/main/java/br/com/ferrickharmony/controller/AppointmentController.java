@@ -2,6 +2,7 @@ package br.com.ferrickharmony.controller;
 
 import br.com.ferrickharmony.dto.appointment.AppointmentRequestDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentResponseDTO;
+import br.com.ferrickharmony.dto.appointment.AppointmentUpdateDTO;
 import br.com.ferrickharmony.enums.AppointmentStatus;
 import br.com.ferrickharmony.service.AppointmentService;
 import jakarta.validation.Valid;
@@ -23,7 +24,7 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/create")
-    public ResponseEntity<AppointmentResponseDTO> create(@RequestBody @Valid AppointmentRequestDTO appointmentRequest,
+    public ResponseEntity<AppointmentResponseDTO> create(@Valid @RequestBody AppointmentRequestDTO appointmentRequest,
                                                          UriComponentsBuilder uriBuilder) {
         AppointmentResponseDTO appointmentResponse = appointmentService.create(appointmentRequest);
         URI uri = uriBuilder.path("/appointments/{id}").buildAndExpand(appointmentResponse.id()).toUri();
@@ -58,6 +59,19 @@ public class AppointmentController {
     public ResponseEntity<Page<AppointmentResponseDTO>> findByStatus(@RequestParam AppointmentStatus status, Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findByStatus(status, pageable);
         return ResponseEntity.ok().body(appointments);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<AppointmentResponseDTO> update(@PathVariable UUID id,
+                                                         @Valid @RequestBody AppointmentUpdateDTO appointmentUpdate) {
+        AppointmentResponseDTO appointmentResponse = appointmentService.update(id, appointmentUpdate);
+        return ResponseEntity.ok().body(appointmentResponse);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        appointmentService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 }

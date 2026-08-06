@@ -2,6 +2,7 @@ package br.com.ferrickharmony.service;
 
 import br.com.ferrickharmony.dto.appointment.AppointmentRequestDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentResponseDTO;
+import br.com.ferrickharmony.dto.appointment.AppointmentUpdateDTO;
 import br.com.ferrickharmony.enums.AppointmentStatus;
 import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.AppointmentMapper;
@@ -17,9 +18,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.UUID;
 
+import static br.com.ferrickharmony.enums.AppointmentStatus.CANCELED;
 import static br.com.ferrickharmony.enums.ErrorKey.*;
 
 @Service
@@ -90,6 +93,52 @@ public class AppointmentService {
     public Page<AppointmentResponseDTO> findByStatus(AppointmentStatus status, Pageable pageable) {
         return appointmentRepository.findByStatus(status, pageable)
                 .map(appointmentMapper::toResponseDTO);
+    }
+
+    @Transactional
+    public AppointmentResponseDTO update(UUID id, AppointmentUpdateDTO appointmentUpdate) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(APPOINTMENT_NOT_FOUND.getKey()));
+
+        updateEntityFromRequest(appointment, appointmentUpdate);
+
+        appointment = appointmentRepository.save(appointment);
+
+        return appointmentMapper.toResponseDTO(appointment);
+    }
+
+    private void updateEntityFromRequest(Appointment entity, AppointmentUpdateDTO appointmentUpdate) {
+        if (appointmentUpdate == null || entity == null) return;
+
+        if (appointmentUpdate.appointmentDate() != null) {
+            entity.setAppointmentDate(appointmentUpdate.appointmentDate());
+        }
+
+        if (appointmentUpdate.professionalId() != null) {
+            Professional professional = professionalRepository.findById(appointmentUpdate.professionalId())
+                    .orElseThrow(() -> new EntityNotFoundException(PROFESSIONAL_NOT_FOUND.getKey()));
+            entity.setProfessional(professional);
+        }
+
+        if (StringUtils.hasText(appointmentUpdate.location())) {
+            entity.setLocation(appointmentUpdate.location());
+        }
+
+        if (StringUtils.hasText(appointmentUpdate.notes())) {
+            entity.setNotes(appointmentUpdate.notes());
+        }
+
+        if (appointmentUpdate.status() != null) {
+            entity.setStatus(appointmentUpdate.status());
+        }
+    }
+
+    @Transactional
+    public void delete(UUID id) {
+        Appointment appointment = appointmentRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException(APPOINTMENT_NOT_FOUND.getKey()));
+        appointment.setStatus(CANCELED);
+        appointmentRepository.save(appointment);
     }
 
 }
