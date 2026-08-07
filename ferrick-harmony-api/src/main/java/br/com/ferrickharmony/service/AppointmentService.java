@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static br.com.ferrickharmony.enums.AppointmentStatus.CANCELED;
@@ -100,6 +101,27 @@ public class AppointmentService {
     public AppointmentResponseDTO update(UUID id, AppointmentUpdateDTO appointmentUpdate) {
         Appointment appointment = appointmentRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException(APPOINTMENT_NOT_FOUND.getKey()));
+
+        boolean changingDate = appointmentUpdate.appointmentDate() != null &&
+                !appointmentUpdate.appointmentDate().equals(appointment.getAppointmentDate());
+
+        boolean changingProfessional = appointmentUpdate.professionalId() != null &&
+                !appointmentUpdate.professionalId().equals(appointment.getProfessional().getId());
+
+        if (changingDate || changingProfessional) {
+            UUID targetProfessionalId = changingProfessional
+                    ? appointmentUpdate.professionalId()
+                    : appointment.getProfessional().getId();
+
+            LocalDateTime targetDate = changingDate
+                    ? appointmentUpdate.appointmentDate()
+                    : appointment.getAppointmentDate();
+
+            if (appointmentRepository.existsByProfessionalIdAndAppointmentDateAndStatusNot(
+                    targetProfessionalId, targetDate, CANCELED)) {
+                throw new BusinessException(APPOINTMENT_CONFLICT.getKey());
+            }
+        }
 
         updateEntityFromRequest(appointment, appointmentUpdate);
 
