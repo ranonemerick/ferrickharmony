@@ -10,6 +10,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -33,7 +34,7 @@ public class AppointmentController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<AppointmentResponseDTO>> findAll(Pageable pageable) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> findAll(@PageableDefault(size = 20) Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findAll(pageable);
         return ResponseEntity.ok().body(appointments);
     }
@@ -45,25 +46,29 @@ public class AppointmentController {
     }
 
     @GetMapping("/patient/{patientId}")
-    public ResponseEntity<Page<AppointmentResponseDTO>> findByPatientId(@PathVariable UUID patientId, Pageable pageable) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> findByPatientId(@PathVariable UUID patientId, 
+                                                                        @PageableDefault(size = 20) Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findByPatientId(patientId, pageable);
         return ResponseEntity.ok().body(appointments);
     }
 
     @GetMapping("/professional/{professionalId}")
-    public ResponseEntity<Page<AppointmentResponseDTO>> findByProfessionalId(@PathVariable UUID professionalId, Pageable pageable) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> findByProfessionalId(@PathVariable UUID professionalId, 
+                                                                             @PageableDefault(size = 20) Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findByProfessionalId(professionalId, pageable);
         return ResponseEntity.ok().body(appointments);
     }
 
     @GetMapping("/status")
-    public ResponseEntity<Page<AppointmentResponseDTO>> findByStatus(@RequestParam AppointmentStatus status, Pageable pageable) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> findByStatus(@RequestParam AppointmentStatus status, 
+                                                                     @PageableDefault(size = 20) Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findByStatus(status, pageable);
         return ResponseEntity.ok().body(appointments);
     }
 
     @GetMapping("/parameters")
-    public ResponseEntity<Page<AppointmentResponseDTO>> findByParameters(AppointmentFilterDTO filter, Pageable pageable) {
+    public ResponseEntity<Page<AppointmentResponseDTO>> findByParameters(AppointmentFilterDTO filter, 
+                                                                         @PageableDefault(size = 20) Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findByParameters(filter, pageable);
         return ResponseEntity.ok().body(appointments);
     }

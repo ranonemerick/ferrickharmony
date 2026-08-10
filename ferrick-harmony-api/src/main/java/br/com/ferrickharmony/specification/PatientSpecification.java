@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.specification;
 
+import br.com.ferrickharmony.dto.patient.PatientFilterDTO;
 import br.com.ferrickharmony.model.Patient;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
@@ -8,26 +9,26 @@ import org.springframework.util.StringUtils;
 
 public class PatientSpecification {
 
-    public static Specification<Patient> withParameters(String name, String cpf, String email, String phone) {
+    public static Specification<Patient> withParameters(PatientFilterDTO patient) {
         return (root, query, builder) -> {
             Predicate p = builder.conjunction();
 
-            if(StringUtils.hasText(name)) {
+            if(StringUtils.hasText(patient.name())) {
                 p = builder.and(p, builder.like(
-                        builder.lower(root.get("name")), "%" + name.toLowerCase() + "%"));
+                        builder.lower(root.get("name")), "%" + patient.name().toLowerCase() + "%"));
             }
 
-            if(StringUtils.hasText(cpf)) {
-                p = builder.and(p, builder.like(builder.lower(root.get("cpf")), "%" + cpf + "%" ));
+            if(StringUtils.hasText(patient.cpf())) {
+                p = builder.and(p, builder.like(builder.lower(root.get("cpf")), "%" + patient.cpf() + "%" ));
             }
 
-            if(StringUtils.hasText(email)) {
+            if(StringUtils.hasText(patient.email())) {
                 p = builder.and(p, builder.like(
-                        builder.lower(root.get("email")), "%" + email.toLowerCase() + "%"));
+                        builder.lower(root.get("email")), "%" + patient.email().toLowerCase() + "%"));
             }
 
-            if(StringUtils.hasText(phone)) {
-                p = builder.and(p, builder.like(builder.lower(root.get("phone")), "%" + phone + "%" ));
+            if(StringUtils.hasText(patient.phone())) {
+                p = builder.and(p, builder.like(builder.lower(root.get("phone")), "%" + patient.phone() + "%" ));
             }
             return p;
         };

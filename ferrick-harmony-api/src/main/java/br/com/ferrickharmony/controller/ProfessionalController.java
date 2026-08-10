@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.controller;
 
+import br.com.ferrickharmony.dto.professional.ProfessionalFilterDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalRequestDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalResponseDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalUpdateDTO;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,13 +33,13 @@ public class ProfessionalController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProfessionalResponseDTO>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<ProfessionalResponseDTO>> listAll(@PageableDefault(size = 20, sort = "asc") Pageable pageable) {
         var professionals = professionalService.listAll(pageable);
         return ResponseEntity.ok().body(professionals);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<Page<ProfessionalResponseDTO>> listActiveProfessionals(Pageable pageable) {
+    public ResponseEntity<Page<ProfessionalResponseDTO>> listActiveProfessionals(@PageableDefault(size = 20, sort = "asc") Pageable pageable) {
         var professionals = professionalService.findActiveProfessionals(pageable);
         return ResponseEntity.ok().body(professionals);
     }
@@ -55,12 +57,9 @@ public class ProfessionalController {
     }
 
     @GetMapping("/parameters")
-    public ResponseEntity<Page<ProfessionalResponseDTO>> findByParameters(@RequestParam(required = false) String name,
-                                                                          @RequestParam(required = false) String cpf,
-                                                                          @RequestParam(required = false) String document,
-                                                                          @RequestParam(required = false) String email,
-                                                                          Pageable pageable) {
-        var professionals = professionalService.findByParameters(name, cpf, document, email, pageable);
+    public ResponseEntity<Page<ProfessionalResponseDTO>> findByParameters(ProfessionalFilterDTO filterDTO,
+                                                                          @PageableDefault(size = 20, sort = "asc") Pageable pageable) {
+        var professionals = professionalService.findByParameters(filterDTO, pageable);
         return ResponseEntity.ok().body(professionals);
 
     }

@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.service;
 
+import br.com.ferrickharmony.dto.professional.ProfessionalFilterDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalRequestDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalResponseDTO;
 import br.com.ferrickharmony.dto.professional.ProfessionalUpdateDTO;
@@ -77,9 +78,8 @@ public class ProfessionalService {
     }
 
     @Transactional(readOnly = true)
-    public Page<ProfessionalResponseDTO> findByParameters(String name, String cpf, String document,
-                                                          String email, Pageable page) {
-        Specification<Professional> spec = ProfessionalSpecification.withParameters(name, cpf, document, email);
+    public Page<ProfessionalResponseDTO> findByParameters(ProfessionalFilterDTO filter, Pageable page) {
+        Specification<Professional> spec = ProfessionalSpecification.withParameters(filter);
         return professionalRepository.findAll(spec, page)
                 .map(professionalMapper::toResponseDTO);
     }

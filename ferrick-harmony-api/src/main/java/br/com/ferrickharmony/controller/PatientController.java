@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.controller;
 
+import br.com.ferrickharmony.dto.patient.PatientFilterDTO;
 import br.com.ferrickharmony.dto.patient.PatientRequestDTO;
 import br.com.ferrickharmony.dto.patient.PatientResponseDTO;
 import br.com.ferrickharmony.dto.patient.PatientUpdateDTO;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -31,13 +33,13 @@ public class PatientController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<PatientResponseDTO>> listAll(Pageable pageable) {
+    public ResponseEntity<Page<PatientResponseDTO>> listAll(@PageableDefault(size = 20, sort = "asc") Pageable pageable) {
         var patients = patientService.listAll(pageable);
         return ResponseEntity.ok().body(patients);
     }
 
     @GetMapping("/active")
-    public ResponseEntity<Page<PatientResponseDTO>> listActivePatients(Pageable pageable) {
+    public ResponseEntity<Page<PatientResponseDTO>> listActivePatients(@PageableDefault(size = 20, sort = "asc") Pageable pageable) {
         var patients = patientService.findActivePatients(pageable);
         return ResponseEntity.ok().body(patients);
     }
@@ -55,12 +57,8 @@ public class PatientController {
     }
 
     @GetMapping("/parameters")
-    public ResponseEntity<Page<PatientResponseDTO>> findByParameters(@RequestParam(required = false) String name,
-                                                                     @RequestParam(required = false) String cpf,
-                                                                     @RequestParam(required = false) String email,
-                                                                     @RequestParam(required = false) String phone,
-                                                                     Pageable page) {
-        Page<PatientResponseDTO> patients = patientService.findByParameters(name, cpf, email, phone, page);
+    public ResponseEntity<Page<PatientResponseDTO>> findByParameters(PatientFilterDTO filter, Pageable page) {
+        Page<PatientResponseDTO> patients = patientService.findByParameters(filter, page);
         return ResponseEntity.ok().body(patients);
     }
 

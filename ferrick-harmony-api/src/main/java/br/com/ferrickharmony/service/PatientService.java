@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.service;
 
+import br.com.ferrickharmony.dto.patient.PatientFilterDTO;
 import br.com.ferrickharmony.dto.patient.PatientRequestDTO;
 import br.com.ferrickharmony.dto.patient.PatientResponseDTO;
 import br.com.ferrickharmony.dto.patient.PatientUpdateDTO;
@@ -75,8 +76,8 @@ public class PatientService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PatientResponseDTO> findByParameters(String name, String cpf, String email, String phone, Pageable page) {
-        Specification<Patient> spec = PatientSpecification.withParameters(name, cpf, email, phone);
+    public Page<PatientResponseDTO> findByParameters(PatientFilterDTO filter, Pageable page) {
+        Specification<Patient> spec = PatientSpecification.withParameters(filter);
         return patientRepository.findAll(spec, page)
                 .map(patientMapper::toResponseDTO);
     }
