@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.controller;
 
+import br.com.ferrickharmony.dto.appointment.AppointmentFilterDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentRequestDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentResponseDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentUpdateDTO;
@@ -58,6 +59,12 @@ public class AppointmentController {
     @GetMapping("/status")
     public ResponseEntity<Page<AppointmentResponseDTO>> findByStatus(@RequestParam AppointmentStatus status, Pageable pageable) {
         Page<AppointmentResponseDTO> appointments = appointmentService.findByStatus(status, pageable);
+        return ResponseEntity.ok().body(appointments);
+    }
+
+    @GetMapping("/parameters")
+    public ResponseEntity<Page<AppointmentResponseDTO>> findByParameters(AppointmentFilterDTO filter, Pageable pageable) {
+        Page<AppointmentResponseDTO> appointments = appointmentService.findByParameters(filter, pageable);
         return ResponseEntity.ok().body(appointments);
     }
 

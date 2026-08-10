@@ -1,5 +1,6 @@
 package br.com.ferrickharmony.service;
 
+import br.com.ferrickharmony.dto.appointment.AppointmentFilterDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentRequestDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentResponseDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentUpdateDTO;
@@ -12,6 +13,7 @@ import br.com.ferrickharmony.model.Professional;
 import br.com.ferrickharmony.repository.AppointmentRepository;
 import br.com.ferrickharmony.repository.PatientRepository;
 import br.com.ferrickharmony.repository.ProfessionalRepository;
+import br.com.ferrickharmony.specification.AppointmentSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -95,6 +97,13 @@ public class AppointmentService {
     public Page<AppointmentResponseDTO> findByStatus(AppointmentStatus status, Pageable pageable) {
         return appointmentRepository.findByStatus(status, pageable)
                 .map(appointmentMapper::toResponseDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<AppointmentResponseDTO> findByParameters(AppointmentFilterDTO filter, Pageable pageable) {
+        return appointmentRepository.findAll(AppointmentSpecification.withFilter(filter), pageable)
+                .map(appointmentMapper::toResponseDTO);
+
     }
 
     @Transactional
