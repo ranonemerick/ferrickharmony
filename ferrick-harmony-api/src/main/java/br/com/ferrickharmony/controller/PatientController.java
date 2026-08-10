@@ -54,6 +54,16 @@ public class PatientController {
         return ResponseEntity.ok().body(patient);
     }
 
+    @GetMapping("/parameters")
+    public ResponseEntity<Page<PatientResponseDTO>> findByParameters(@RequestParam(required = false) String name,
+                                                                     @RequestParam(required = false) String cpf,
+                                                                     @RequestParam(required = false) String email,
+                                                                     @RequestParam(required = false) String phone,
+                                                                     Pageable page) {
+        Page<PatientResponseDTO> patients = patientService.findByParameters(name, cpf, email, phone, page);
+        return ResponseEntity.ok().body(patients);
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<PatientResponseDTO> update(@PathVariable UUID id,
                                                      @RequestBody @Valid PatientUpdateDTO patientUpdate) {
