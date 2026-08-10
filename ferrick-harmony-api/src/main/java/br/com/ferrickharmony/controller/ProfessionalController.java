@@ -54,6 +54,17 @@ public class ProfessionalController {
         return ResponseEntity.ok().body(professional);
     }
 
+    @GetMapping("/parameters")
+    public ResponseEntity<Page<ProfessionalResponseDTO>> findByParameters(@RequestParam(required = false) String name,
+                                                                          @RequestParam(required = false) String cpf,
+                                                                          @RequestParam(required = false) String document,
+                                                                          @RequestParam(required = false) String email,
+                                                                          Pageable pageable) {
+        var professionals = professionalService.findByParameters(name, cpf, document, email, pageable);
+        return ResponseEntity.ok().body(professionals);
+
+    }
+
     @PutMapping("/update/{id}")
     public ResponseEntity<ProfessionalResponseDTO> update(@PathVariable UUID id,
                                                           @RequestBody @Valid ProfessionalUpdateDTO professionalUpdate) {

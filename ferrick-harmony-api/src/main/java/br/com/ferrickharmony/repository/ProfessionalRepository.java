@@ -6,11 +6,12 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ProfessionalRepository extends JpaRepository<Professional, UUID> {
+public interface ProfessionalRepository extends JpaRepository<Professional, UUID>, JpaSpecificationExecutor<Professional> {
     boolean existsByCpf(String cpf);
     boolean existsByEmail(String sanitizedEmail);
     boolean existsByEmailAndIdNot(String email, UUID id);

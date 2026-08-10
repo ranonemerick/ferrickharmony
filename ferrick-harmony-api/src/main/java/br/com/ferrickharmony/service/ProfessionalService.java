@@ -7,10 +7,12 @@ import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.ProfessionalMapper;
 import br.com.ferrickharmony.model.Professional;
 import br.com.ferrickharmony.repository.ProfessionalRepository;
+import br.com.ferrickharmony.specification.ProfessionalSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -72,6 +74,14 @@ public class ProfessionalService {
         return professionalRepository.findByCpf(cpf)
                 .map(professionalMapper::toResponseDTO)
                 .orElseThrow(() -> new EntityNotFoundException(PROFESSIONAL_NOT_FOUND.getKey()));
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProfessionalResponseDTO> findByParameters(String name, String cpf, String document,
+                                                          String email, Pageable page) {
+        Specification<Professional> spec = ProfessionalSpecification.withParameters(name, cpf, document, email);
+        return professionalRepository.findAll(spec, page)
+                .map(professionalMapper::toResponseDTO);
     }
 
     @Transactional
