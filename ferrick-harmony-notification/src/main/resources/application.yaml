@@ -1,12 +1,12 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
-    name: ferrick-harmony-api
+    name: ferrick-harmony-notification
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/ferrick-harmony
+    url: jdbc:postgresql://localhost:5434/ferrick-harmony-notification
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -19,10 +19,11 @@ spring:
       hibernate:
         format_sql: true
 
-  messages:
-    basename: i18n/messages
-    encoding: UTF-8
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
 
-token:
-  jwt:
-    secret: ${JWT_SECRET:secret}
+  flyway:
+    enabled: false

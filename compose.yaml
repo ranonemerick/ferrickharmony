@@ -1,4 +1,7 @@
 services:
+  # -----------------------------------------------------------
+  # 1. Main API Database (Ferrick Harmony)
+  # -----------------------------------------------------------
   postgres:
     image: 'postgres:latest'
     environment:
@@ -8,6 +11,66 @@ services:
     ports:
       - '5433:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+
+  # -----------------------------------------------------------
+  # 2. Notification Microservice Database
+  # -----------------------------------------------------------
+  postgres-notification:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=ferrick-harmony-notification'
+      - 'POSTGRES_PASSWORD=${FH_NOTIF_POSTGRES_PASSWORD:-postgres}'
+      - 'POSTGRES_USER=${FH_NOTIF_POSTGRES_USER:-postgres}'
+    ports:
+      - '5434:5432'
+    volumes:
+      - postgres_notification_data:/var/lib/postgresql/data
+
+  # -----------------------------------------------------------
+  # 3. RabbitMQ (Message Broker)
+  # -----------------------------------------------------------
+  rabbitmq:
+    image: 'rabbitmq:3-management'
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  # -----------------------------------------------------------
+  # 4. Main API Application
+  # -----------------------------------------------------------
+  api:
+    build:
+      context: ./ferrick-harmony-api
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/ferrick-harmony
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - postgres
+      - rabbitmq
+
+  # -----------------------------------------------------------
+  # 5. Notification Microservice Application
+  # -----------------------------------------------------------
+  notification:
+    build:
+      context: ./ferrick-harmony-notification
+      dockerfile: Dockerfile
+    ports:
+      - '8081:8081'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-notification:5432/ferrick-harmony-notification
+      - SPRING_RABBITMQ_HOST=rabbitmq
+    depends_on:
+      - postgres-notification
+      - rabbitmq
+
 volumes:
   postgres_data:
+  postgres_notification_data:
