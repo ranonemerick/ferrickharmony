@@ -27,3 +27,14 @@ spring:
 
   flyway:
     enabled: false
+
+broker:
+  queue:
+    email:
+      name: appointment.email.queue
+  exchange:
+    appointment:
+      name: appointment.exchange
+  routing-key:
+    email:
+      name: appointment.email.routingKey

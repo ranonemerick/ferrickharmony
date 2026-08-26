@@ -11,7 +11,7 @@ services:
     ports:
       - '5433:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
 
   # -----------------------------------------------------------
   # 2. Notification Microservice Database
@@ -25,7 +25,7 @@ services:
     ports:
       - '5434:5432'
     volumes:
-      - postgres_notification_data:/var/lib/postgresql/data
+      - postgres_notification_data:/var/lib/postgresql
 
   # -----------------------------------------------------------
   # 3. RabbitMQ (Message Broker)
