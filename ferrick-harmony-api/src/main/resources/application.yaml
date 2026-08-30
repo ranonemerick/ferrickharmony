@@ -5,6 +5,10 @@ spring:
   application:
     name: ferrick-harmony-api
 
+  docker:
+    compose:
+      enabled: false
+
   datasource:
     url: jdbc:postgresql://localhost:5433/ferrick-harmony
     username: postgres
@@ -22,6 +26,23 @@ spring:
   messages:
     basename: i18n/messages
     encoding: UTF-8
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+broker:
+  queue:
+    email:
+      name: appointment.email.queue
+  exchange:
+    appointment:
+      name: appointment.exchange
+  routing-key:
+    email:
+      name: appointment.email.routingKey
 
 token:
   jwt:

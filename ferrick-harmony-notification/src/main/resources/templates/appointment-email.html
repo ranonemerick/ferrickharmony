@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body style="margin: 0; padding: 0; background-color: #f4f4f4;">
+<div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+    <div style="background-color: #4CAF50; padding: 20px; text-align: center;">
+        <h2 style="color: white; margin: 0;">Ferrick Harmony Clínica</h2>
+    </div>
+    <div style="padding: 20px;">
+        <p>Olá, <b th:text="${patientName}">Nome do Paciente</b>,</p>
+        <p>Este é um aviso sobre o seu agendamento em nossa clínica.</p>
+
+        <div style="background-color: #f9f9f9; padding: 15px; border-left: 4px solid #4CAF50; margin: 20px 0;">
+            <p style="margin: 5px 0;">👨‍⚕️ <b>Profissional:</b> <span th:text="${professionalName}">Nome do Médico</span></p>
+            <p style="margin: 5px 0;">📅 <b>Data e Hora:</b> <span th:text="${date}">00/00/0000 00:00</span></p>
+            <p style="margin: 5px 0;">🏥 <b>Local:</b> <span th:text="${location}">Endereço</span></p>
+        </div>
+
+        <p>Se precisar reagendar, entre em contato conosco com antecedência.</p>
+        <p>Atenciosamente,<br><b>Equipe Ferrick Harmony</b></p>
+    </div>
+</div>
+</body>
+</html>

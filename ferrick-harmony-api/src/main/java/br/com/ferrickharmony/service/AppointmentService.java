@@ -4,18 +4,22 @@ import br.com.ferrickharmony.dto.appointment.AppointmentFilterDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentRequestDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentResponseDTO;
 import br.com.ferrickharmony.dto.appointment.AppointmentUpdateDTO;
+import br.com.ferrickharmony.dto.email.EmailDTO;
 import br.com.ferrickharmony.enums.AppointmentStatus;
 import br.com.ferrickharmony.exception.BusinessException;
 import br.com.ferrickharmony.mapper.AppointmentMapper;
 import br.com.ferrickharmony.model.Appointment;
 import br.com.ferrickharmony.model.Patient;
 import br.com.ferrickharmony.model.Professional;
+import br.com.ferrickharmony.producer.UserProducer;
 import br.com.ferrickharmony.repository.AppointmentRepository;
 import br.com.ferrickharmony.repository.PatientRepository;
 import br.com.ferrickharmony.repository.ProfessionalRepository;
 import br.com.ferrickharmony.specification.AppointmentSpecification;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 import static br.com.ferrickharmony.enums.AppointmentStatus.CANCELED;
@@ -36,6 +41,8 @@ public class AppointmentService {
     private final PatientRepository patientRepository;
     private final ProfessionalRepository professionalRepository;
     private final AppointmentMapper appointmentMapper;
+    private final UserProducer producer;
+    private final MessageSource messageSource;
 
     @Transactional
     public AppointmentResponseDTO create(AppointmentRequestDTO request) {
@@ -65,6 +72,14 @@ public class AppointmentService {
         appointment.setStatus(AppointmentStatus.SCHEDULED);
 
         appointment = appointmentRepository.save(appointment);
+
+        String subject = messageSource.getMessage(
+                "email.appointment.confirmed.subject",
+                null,
+                LocaleContextHolder.getLocale()
+        );
+
+        sendEmailNotification(patient, subject, appointment);
 
         return appointmentMapper.toResponseDTO(appointment);
     }
@@ -171,6 +186,26 @@ public class AppointmentService {
                 .orElseThrow(() -> new EntityNotFoundException(APPOINTMENT_NOT_FOUND.getKey()));
         appointment.setStatus(CANCELED);
         appointmentRepository.save(appointment);
+    }
+
+    private void sendEmailNotification(Patient patient, String subject, Appointment appointment) {
+        Map<String, Object> variables = Map.of(
+                "patientName", patient.getName(),
+                "professionalName", appointment.getProfessional().getName(),
+                "date", appointment.getAppointmentDate().toString(),
+                "location", appointment.getLocation() != null ? appointment.getLocation() : "Ferrick Harmony"
+        );
+
+        EmailDTO emailDTO = new EmailDTO(
+                patient.getId(),
+                patient.getEmail(),
+                subject,
+                null,
+                "appointment-email",
+                variables
+        );
+
+        producer.publishEmailMessage(emailDTO);
     }
 
 }

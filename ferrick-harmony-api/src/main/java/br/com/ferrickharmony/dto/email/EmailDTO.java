@@ -1,4 +1,4 @@
-package br.com.ferrickharmony.notification.dto;
+package br.com.ferrickharmony.dto.email;
 
 import java.util.Map;
 import java.util.UUID;

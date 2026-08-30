@@ -67,6 +67,8 @@ services:
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-notification:5432/ferrick-harmony-notification
       - SPRING_RABBITMQ_HOST=rabbitmq
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
     depends_on:
       - postgres-notification
       - rabbitmq
